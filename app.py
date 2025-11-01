@@ -32,33 +32,6 @@ except Exception as e:
     st.stop()
 # ஜெமினி மாடலைத் தொடங்குதல்
 model = genai.GenerativeModel(
-    model_name='gemini-1.5-pro',
+    model_name='gemini-pro',
     system_instruction=SYSTEM_PROMPT
 )
-# --- சாட் (Chat) தர்க்கம் ---
-# சாட் வரலாற்றை Session State-ல் சேமித்தல்
-if "chat_session" not in st.session_state:
-    st.session_state.chat_session = model.start_chat(history=[])
-# பழைய மெசேஜ்களைக் காட்டுதல்
-for msg in st.session_state.chat_session.history:
-    # மாடலின் (assistant) செய்திகளை மட்டும் காட்டினால் போதும், அல்லது இரண்டையும் காட்டலாம்.
-    # நாம் பயனர் மற்றும் மாடல் இரண்டின் செய்திகளையும் காட்டுவோம்.
-    role = "assistant" if msg.role == "model" else msg.role
-    with st.chat_message(role):
-        st.markdown(msg.parts[0].text)
-# புதிய பயனர் உள்ளீட்டைப் பெறுதல்
-prompt = st.chat_input("இங்கே டைப் செய்யவும்...")
-if prompt:
-    # பயனர் செய்தியைக் காட்டுதல்
-    with st.chat_message("user"):
-        st.markdown(prompt)
-    # ஜெமினிக்கு செய்தியை அனுப்புதல்
-    try:
-        response = st.session_state.chat_session.send_message(prompt)
-        
-        # ஜெமினியின் பதிலைக் காட்டுதல்
-        with st.chat_message("assistant"):
-            st.markdown(response.text)
-            
-    except Exception as e:
-        st.error(f"செய்தி அனுப்புவதில் பிழை: {e}")
