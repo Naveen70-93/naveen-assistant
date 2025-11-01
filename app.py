@@ -1,27 +1,22 @@
 import streamlit as st
 import google.generativeai as genai
-
 # --- உங்கள் அசிஸ்டன்டுக்கான தனிப்பட்ட அறிவுறுத்தல்கள் ---
 SYSTEM_PROMPT = """
 நீ நவீனின் AI அசிஸ்டன்ட் (Naveen's Assistant). 
 நீ ஒரு திறமையான AI உதவியாளர். உன்னிடம் கேட்கப்படும் கேள்விகளுக்கு விரிவாகவும், துல்லியமாகவும் பதிலளிக்க வேண்டும்.
-
 உன்னுடைய சிறப்பம்சங்கள்:
 1. **முக்கிய மொழி:** நீ முக்கியமாக தமிழில் தான் பேச வேண்டும். பயனர் ஆங்கிலத்தில் கேட்டால் ஆங்கிலத்தில் பதிலளிக்கலாம், ஆனால் இயல்பாகவே தமிழில் உரையாடலைத் தொடரவும்.
 2. **தொழில்நுட்ப நிபுணர்:** நீ Electronics and Communication Engineering (ECE) மற்றும் Computer Science (CSE) சம்பந்தப்பட்ட தலைப்புகளில் ஒரு நிபுணரைப் போல செயல்பட வேண்டும். ரெசிஸ்டர் (Resistor), டிரான்சிஸ்டர் (Transistor), VLSI, AI போன்ற கடினமான விஷயங்களைக் கூட ஒரு இன்ஜினியரிங் மாணவருக்குப் புரியும் வகையில் எளிமையான உதாரணங்களுடன் விளக்க வேண்டும்.
 3. **உரையாடல்:** நீ ஜெமினி (Gemini) போலவே, கேட்கும் கேள்விகளுக்கு மட்டும் பதிலளிக்காமல், உரையாடலைத் தொடரவும், மேலும் தகவல்களை வழங்கவும் வேண்டும்.
 """
-
 # --- Streamlit பக்க வடிவமைப்பு ---
 st.set_page_config(
     page_title="நவீனின் AI அசிஸ்டன்ட்",
     page_icon="🤖",
     layout="centered",
 )
-
 st.title("🤖 நவீனின் AI அசிஸ்டன்ட்")
 st.caption("Electronics (ECE) மற்றும் Coding பற்றி என்னிடம் கேளுங்கள்!")
-
 # --- API Key செட்டப் ---
 try:
     api_key = st.secrets["GOOGLE_API_KEY"]
@@ -32,29 +27,24 @@ except KeyError:
 except Exception as e:
     st.error(f"ஒரு பிழை ஏற்பட்டது: {e}")
     st.stop()
-
 # --- ஜெமினி மாடல் ---
-model = genai.GenerativeModel('gemini-pro')
-
+model = genai.GenerativeModel('gemini-1.5-flash')
 # --- சாட் வரலாற்றை Session State-ல் சேமித்தல் ---
 if "messages" not in st.session_state:
     st.session_state.messages = [
         {"role": "user", "content": SYSTEM_PROMPT},
         {"role": "assistant", "content": "வணக்கம் நவீன்! நான் உங்களுக்காகத் தயார். உங்கள் ECE மற்றும் Coding சந்தேகங்களைக் கேளுங்கள். 😊"}
     ]
-
 # --- பழைய மெசேஜ்களைக் காட்டுதல் (முதல் 2 மெசேஜ்களைத் தவிர) ---
 for message in st.session_state.messages[2:]:  # System prompt-ஐ தவிர்க்க
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
-
 # --- புதிய பயனர் உள்ளீடு ---
 if prompt := st.chat_input("இங்கே டைப் செய்யவும்..."):
     # பயனர் செய்தியைச் சேமித்து காட்டுதல்
     st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
         st.markdown(prompt)
-
     # ஜெமினிக்கு அனுப்புதல்
     with st.chat_message("assistant"):
         try:
